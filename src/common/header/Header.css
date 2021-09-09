@@ -1,0 +1,36 @@
+.header{
+    background-color: #222;
+    height: 53px;
+    padding: 8px 32px 8px 16px;
+    display: flex;
+    justify-content: space-between;
+}
+.btn-container{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+}
+.login-logout-button:hover{
+    cursor: pointer;
+}
+.book-movie-btn:hover{
+    cursor: pointer;
+}
+.login-logout-button{
+    margin-left: 4px;
+}
+
+
+.logoSvg{
+    background-color:#aa9191;
+    height: 35px;
+    animation: logo_animation 8s linear 0s infinite;
+}
+
+@keyframes logo_animation{
+    0%{transform:rotate(0deg)}
+    25%{transform:rotate(90deg)}
+    50%{transform:rotate(180deg)}
+    75%{transform:rotate(270deg)}
+    100%{transform:rotate(360deg)}
+}
