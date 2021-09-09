@@ -12,10 +12,10 @@ class Controller extends Component {
             <div>
                 <Router>
                     <Switch>
-                        <Route path='/' exact component={Home}/>
-                        <Route path='/details/:id' exact exact component={Details}/>
-                        <Route path='/details/bookshow' exact component={BookShow}/>
-                        <Route path='/details/bookshow/confirmation' exact component={Confirmation}/>
+                        <Route path='/' exact component={Home} />
+                        <Route path='/movie/:id' exact component={Details}/>
+                        <Route path='/movie/shows/:id' exact component={BookShow}/>
+                        <Route path='/movie/bookshow/confirmation' exact component={Confirmation}/>
                     </Switch>
                 </Router>
             </div>

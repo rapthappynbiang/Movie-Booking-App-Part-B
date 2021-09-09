@@ -6,14 +6,17 @@ import { Link } from 'react-router-dom';
 
 //released movie grid component
 export default function ImageListReleased(props){
-
+ 
+    // movies data array
+    const moviesData= props.moviesData
+    
     return (
       <div key={"release-movies-Container"} style={{marginLeft: '2%', width: '100%'}}>
          <ImageList key="release-grid-list-main" cols={4} style={{flexWrap: 'wrap', width: '100%'}}>
-            {props.moviesData.map((movie) => (
+            {moviesData.map((movie) => (
               
               <ImageListItem key={"movie-item"+movie.id} className="movie-item" style={{width: '19%', height: 350, margin: '2% 1% 0%'}}>
-               <Link to = {'/details/'+ movie.id}>
+               <Link to = {'/movie/'+ movie.id}>
                 <img src={movie.poster_url} alt={movie.title} style={{width: 'fit-content'}} />
                    <ImageListItemBar
                      key={"item-bar-"+movie.id}

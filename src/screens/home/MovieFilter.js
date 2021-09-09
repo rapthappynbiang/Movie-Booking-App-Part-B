@@ -29,6 +29,8 @@ export default function MovieFilter(props){
     const [genreName, setGenreName] = React.useState([]);
     const [artistName, setArtistsName] = React.useState([]);
 
+    var moviesData = props.moviesData.moviesData;
+
     var filteredMoviesData = {moviesData: []};
 
     const handleGenreChange = (event)=>{
@@ -42,7 +44,7 @@ export default function MovieFilter(props){
         return (
           <Card key={"card-container"} style={{height: 'fit-content', marginTop: '2%', width: '75%'}}>
             {/**Card heading */}
-              <CardHeader key={"card-header"} id="card-header" className={classes.cardheader} title="FIND MOVIES BY:" />
+              <CardHeader key={"card-header"} id="card-header" color="primary" className={classes.cardheader} title="FIND MOVIES BY:" />
                 
                   {/**Movie Name */}
                   <CardContent key={"movie-name"} className={classes.cardContent}>
@@ -121,8 +123,9 @@ export default function MovieFilter(props){
               {/**Apply button */}
               <CardContent key={"filter-button"} className={classes.cardContent} style={{justifyContent: 'center'}}>
                     <Button variant='contained' color='primary' style={{width: 240}} onClick={()=>{
-                         props.applyFilters(filteredMoviesData.moviesData)
-                    }}>
+                                                                                               applyFilters(filteredMoviesData.moviesData)
+                                                                                              }
+                                                                                             }>
                       <span style={{color: 'white'}}>Apply</span>
                     </Button>
               </CardContent>
@@ -142,15 +145,15 @@ export default function MovieFilter(props){
             // search by name
               if(id === "movie-name"){
                 //check for data from the moviesData for a match{
-                  for(let i=0;i<props.moviesData.length;i++){
+                  for(let i=0;i<moviesData.length;i++){
                     //comapre the value
-                    if(value.toUpperCase() === props.moviesData[i].title.toUpperCase()){
+                    if(value.toUpperCase() === moviesData[i].title.toUpperCase()){
                       //if equal check if data is already present if filtered data is not empty
                       if(filteredMoviesData.moviesData.length!==0){
                         //iterate and check
                         for(let j=0;j<filteredMoviesData.moviesData.length;j++){
                           // if id is present then set isPresent true and break
-                          if(props.moviesData[i].id === filteredMoviesData[j].id){
+                          if(moviesData[i].id === filteredMoviesData[j].id){
                             isPresent = true;
                             break;
                           }
@@ -158,11 +161,11 @@ export default function MovieFilter(props){
     
                         //Movie not present push 
                         if(isPresent === false){
-                            filteredMoviesData.moviesData.push(props.moviesData[i]);
+                            filteredMoviesData.moviesData.push(moviesData[i]);
                             break;
                         }
                       }else{
-                        filteredMoviesData.moviesData.push(props.moviesData[i]);
+                        filteredMoviesData.moviesData.push(moviesData[i]);
                         break;
                       }
     
@@ -171,15 +174,15 @@ export default function MovieFilter(props){
                   }   
               }else if(id === "select-genre"){
                   //search by genre
-                  for(let i=0;i<props.moviesData.length;i++){
-                    for(let j=0;j<props.moviesData[i].grnres.length;j++){
+                  for(let i=0;i<moviesData.length;i++){
+                    for(let j=0;j<moviesData[i].grnres.length;j++){
                       //check if genres are matching
-                      if(value.toUpperCase() === props.moviesData[i].grnres[j].toUpperCase()){
+                      if(value.toUpperCase() === moviesData[i].grnres[j].toUpperCase()){
                         //check if movie is present in filtered data
                         if(filteredMoviesData.moviesData.length !== 0){
                           for(let k=0;k<filteredMoviesData.moviesData.length;k++){
                             //if movie id is matching and it is present break
-                            if(props.moviesData[i].id === filteredMoviesData.moviesData[k].id){
+                            if(moviesData[i].id === filteredMoviesData.moviesData[k].id){
                               isPresent = true;
                               break;
                             }
@@ -187,12 +190,12 @@ export default function MovieFilter(props){
                           if(isPresent === false){
                             //if movie not present push it
                             isPresent= true;
-                            filteredMoviesData.moviesData.push(props.moviesData[i]);
+                            filteredMoviesData.moviesData.push(moviesData[i]);
                             break;
                           }
                         }else{
                           //if filtered data is empty push
-                            filteredMoviesData.moviesData.push(props.moviesData[i]);
+                            filteredMoviesData.moviesData.push(moviesData[i]);
                             break;
                         }
                       }
@@ -204,17 +207,17 @@ export default function MovieFilter(props){
                   }
               }else{
                   // search by artists
-                  for(let i=0; i<props.moviesData.length;i++){
+                  for(let i=0; i<moviesData.length;i++){
                     //compare with value by iterating the artists array
-                    for(let j=0;j<props.moviesData[i].artists.length;j++){
+                    for(let j=0;j<moviesData[i].artists.length;j++){
                       // if equal check if movie is alreadyfiltered
-                      if(value.toUpperCase() === props.moviesData[i].artists[j].toUpperCase()){
+                      if(value.toUpperCase() === moviesData[i].artists[j].toUpperCase()){
                         //if filtered array is nt empty
                         if(filteredMoviesData.moviesData.length !== 0){
                           //iterate through filtered data
                           for(let k=0;k<filteredMoviesData.moviesData.length;k++){
                             //if movie id is present set isPresent to true and break
-                            if(props.moviesData.id === filteredMoviesData.moviesData[k].id){
+                            if(moviesData.id === filteredMoviesData.moviesData[k].id){
                               isPresent = true;
                               break;
                             }
@@ -223,12 +226,12 @@ export default function MovieFilter(props){
                           //if movie is not present push
                           if(isPresent === false){
                             isPresent = true;
-                            filteredMoviesData.moviesData.push(props.moviesData[i]);
+                            filteredMoviesData.moviesData.push(moviesData[i]);
                             break;
                           }
                         }else{
                           isPresent = true;
-                          filteredMoviesData.moviesData.push(props.moviesData[i]);
+                          filteredMoviesData.moviesData.push(moviesData[i]);
                           break;
                         }
                       }
@@ -240,9 +243,10 @@ export default function MovieFilter(props){
                     }
                   }
               }
+        }
 
-              function applyFilters(){
-                props.applyFilters(filteredMoviesData);
-              }
+        function applyFilters(filteredMoviesData){
+          debugger;
+          props.applyFilters(filteredMoviesData);
         }
   }

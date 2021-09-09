@@ -1,69 +1,76 @@
-import  { React, Component } from 'react';
+import  { React, useState } from 'react';
 import { Button } from '@material-ui/core';
 import './Header.css';
-import LoginModal from './LoginModal.js';
-import logo from './logo.svg';
+import logo from '../../assets/logo.svg';
+import {Link} from 'react-router-dom';
 
-export default class Header extends Component{
 
-        state={open: false}
+export default function Header(props){
+
+        //to set open state of login/register modal
+        const [modalOpenState, setopenState] = useState(false);
+     
        
-        render(){
+        
          return <div id="header" className="header">
                         <img src={logo} className="logoSvg" alt="logo" />
                         {(()=>{
                                 
-                                var location = window.location.href.split("/")[3];
-                                if( location == ""){
+                                var path = props.match.path;
+                                if( path == "/"){
                                         //header for home page
-                                return (
-                                        <div>
-                                                <Button variant="contained" id="login-btn" className="login-logout-button btn btn-sm" style={{marginLeft: 10}} onClick={this.handleModalOpen}>
-                                                        <span>LOGIN</span>
-                                                </Button> 
-                                
-                                                <Button variant="contained" id="logout-btn" className="login-logout-button btn btn-sm" style={{display: 'none', marginLeft: 10}} onClick={this.logoutHandler}>
-                                                        <span>LOGOUT</span>
-                                                </Button>  
-
-                                                //Login Modal
-                                                <LoginModal login={this.login} />
-                                        </div>
-                                )
-                                }else{
+                                        return (
+                                                <div>
+                                                        <Button variant="contained" id="login-btn" className="login-logout-button btn btn-sm" style={{marginLeft: 10}} onClick={handleModalOpen}>
+                                                                <span>LOGIN</span>
+                                                        </Button> 
+                                        
+                                                        <Button variant="contained" id="logout-btn" className="login-logout-button btn btn-sm" style={{display: 'none', marginLeft: 10}} onClick={logoutHandler}>
+                                                                <span>LOGOUT</span>
+                                                        </Button>  
+                                                </div>
+                                        );
+                                }else if(path == "/movie/:id"){
                                         // if page is detatial page we render necessary buttons
                                         return(
                                                 <div class="btn-container">
-                                                <Button id="book-movie-btn" color="primary" variant="contained" className="btn btn-primary btn-sm" onClick={this.bookingHandler}>
-                                                        <span>BOOK SHOW</span>
-                                                </Button>   
+                                                        <Button id="book-movie-btn" color="primary" variant="contained" className="btn btn-primary btn-sm" onClick={bookingHandler}>
+                                                              <span>BOOK SHOW</span>
+                                                        </Button>   
 
-                                                <Button variant="contained" id="login-btn" className="login-logout-button btn btn-primary btn-sm" style={{marginLeft: 10}} onClick={this.handleModalOpen}>
-                                                        <span>LOGIN</span>
-                                                </Button> 
-                                
-                                                <Button variant="contained" id="logout-btn" className="login-logout-button btn btn-primary btn-sm" style={{display: 'none', marginLeft: 10}} onClick={this.logoutHandler}>
-                                                        <span>LOGOUT</span>
-                                                </Button>  
-
-                                                //Login Modal
-                                                <LoginModal open={this.state.open} login={this.login} />
-                                                </div>
-                                        )
-                                }
-                        })()}
+                                                        <Button variant="contained" id="login-btn" className="login-logout-button btn btn-primary btn-sm" style={{marginLeft: 10}} onClick={handleModalOpen}>
+                                                                <span>LOGIN</span>
+                                                        </Button> 
+                                        
+                                                        <Button variant="contained" id="logout-btn" className="login-logout-button btn btn-primary btn-sm" style={{display: 'none', marginLeft: 10}} onClick={logoutHandler}>
+                                                                <span>LOGOUT</span>
+                                                        </Button> 
+                                               </div> 
+                                        );
+                                  }else{
+                                          return <div>
+                                                     <Button variant="contained" id="logout-btn" className="login-logout-button btn btn-primary btn-sm" style={{display: 'inline-block', marginLeft: 10}} onClick={logoutHandler}>
+                                                                <span>LOGOUT</span>
+                                                        </Button>
+                                                 </div>
+                                  }
+                                })()}
                 </div>
-        }
 
-        bookingHandler(){
+       function bookingHandler(event){
                 if(window.localStorage.userName === undefined || window.localStorage.userName === null){
-                   alert("Please Login");
+                //    alert("Please Login");
+                //    event.preventDefault();
+                //below line is add for testing purpose only
+                   props.history.push({pathname: `/movie/shows/${props.match.params.id}`});
                 }else{
-                        //redirect to payment
+                        //redirect to book show page
+                        //set showUrl to /movie/shows/:id
+                        props.history.push({pathname: `/movie/shows/${props.match.params.id}`});
                 }
         }
 
-        logoutHandler(){
+       function logoutHandler(){
             //clear local storage
             window.localStorage.clear();
             document.getElementById('logout-btn').style.display= "none";
@@ -71,7 +78,7 @@ export default class Header extends Component{
         }
        
        
-        login(){
+        function login(){
                 let userName = document.getElementById("username").value;
                 let passWord = document.getElementById("password").value;
                 if(userName == "admin" && passWord == "admin"){
@@ -85,11 +92,12 @@ export default class Header extends Component{
                 }
             }
 
-     handleClose(){
-             this.setState({open: false});
+    function handleClose(){
+        setopenState(false);
      }
 
-     handleModalOpen(){
-             this.setState({open: true});
+     function handleModalOpen(){
+        setopenState(true);
      }
+
 }

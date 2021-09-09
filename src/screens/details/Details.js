@@ -9,10 +9,13 @@ import YouTube from 'react-youtube';
 import {useState, useEffect} from 'react';
 import Header from '../../common/header/Header'
 import './Details.css';
-import moviesData from '../../common/moviesData'
+import moviesData from '../../assets/moviesData'
 
 
 export  default function Details(props){
+    
+    
+    console.log(props);
     
     const movieId = useParams();
     var movieData;
@@ -52,7 +55,7 @@ export  default function Details(props){
           };
          return(
             <Fragment>
-                 <Header />
+                 <Header {...props}/>
                  <div id="content-main-container">
                     <div>
                         <Typography className="back-home-btn" variant="button" style={{margin: '8px 0px 0px 24px', height: '24px'}}>
@@ -134,7 +137,7 @@ export  default function Details(props){
                                 <Typography variant="button" className="star-icon" onClick={()=>{setStarRatings(5)}}>
                                     <StarBorderIcon  />
                                 </Typography >
-                                <input id="star-rating-value" type="number" value={0} style={{display: 'none'}}/>
+                                <input id="star-rating-value" type="number" value={0} style={{display: 'none'}} onChange={submitRatingsValue}/>
 
                                 {/**-------------Artists Images---------------------*/}
                                 <div id="artists-container">
@@ -168,8 +171,7 @@ export  default function Details(props){
     }
 
      function setStarRatings(value){
-          //set input value as value for submitting rating value
-       document.getElementById('star-rating-value').value = value;
+    
         var starIconsList = document.getElementsByClassName("star-icon");
 
         //set the color of stars selected
@@ -182,5 +184,13 @@ export  default function Details(props){
                 starIconsList[i].style.color = "black";
             }
         }
-}
+
+        //set input value as value for submitting rating value
+       document.getElementById('star-rating-value').value = value;
+     }
+
+     function submitRatingsValue(event){
+         //set some data to be submitted
+         var ratings = event.target.value;
+     }
 }
