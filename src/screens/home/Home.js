@@ -7,7 +7,7 @@ import MovieFilter from './MovieFilter';
 import moviesData from '../../assets/moviesData';
 import genres from '../../assets/genre';
 import artists from '../../assets/artists'
-import {useState, useEffect}from 'react';
+import {useState}from 'react';
 
 
 
