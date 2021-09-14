@@ -14,7 +14,7 @@ class Controller extends Component {
                     <Switch>
                         <Route path='/' exact component={Home} />
                         <Route path='/movies/:id' exact component={Details}/>
-                        <Route path='/movie/shows/:id' exact component={BookShow}/>
+                        <Route path='/movies/:id/shows/' exact component={BookShow}/>
                         <Route path='/confirm/:id' exact component={Confirmation}/>
                     </Switch>
                 </Router>

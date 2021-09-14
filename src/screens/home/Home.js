@@ -16,7 +16,7 @@ export default function Home(props){
     
     //state for upcoming movies
     const [upcomingMovies, setUpcomingMovies] = useState({moviesData: [{
-                                                                id: "",
+                                                                id: "M1", // for testing only give default value
                                                                 poster_url: "",
                                                                 title: "",
                                                                 release_date: "",
@@ -36,36 +36,38 @@ export default function Home(props){
                                                     });
     // After mounting fetch data from server 
     useEffect(()=>{
-       var upcomingMoviesData = await  loadData("http://localhost:8085/api/movies?status=PUBLISHED");
-       var releaseMoviesData = await loadData("http://localhost:8085/api/movies?status=RELEASED");
-       // set the upcoming MovieData
-       setUpcomingMovies({
-           moviesData: upcomingMoviesData
-       });
 
-       //set Released Movies Data
-       setReleaseMovies({
-           moviesData: releaseMoviesData
-       })
+        var raw = "";
+
+        var requestOptions = {
+        method: 'GET',
+        body: raw,
+        redirect: 'follow'
+        };
+
+        //fetch data api from server
+        fetch("http://localhost:8085/api/movies?status=RELEASED", requestOptions)
+        .then(response => response.text())
+        .then((result)=>{
+            //set Released Movies Data
+           setUpcomingMovies({
+            moviesData: result.json()
+           })
+         })
+         .catch(error => console.log('error', error));
+
+       //fetch data api from server
+            fetch("http://localhost:8085/api/movies?status=RELEASED", requestOptions)
+            .then(response => response.text())
+            .then((result)=>{
+                //set Released Movies Data
+               setReleaseMovies({
+                moviesData: result.json()
+               })
+             })
+            .catch(error => console.log('error', error));
     },[])
     
-
-
-    //to load the data from server
-     async function loadData(url){
-
-            //fetch data api from server
-            fetch(url,{
-                method: 'GET', // 'GET', 'PUT', 'PATCH', 'DELETE' all work here
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: dataShows
-            })
-            .then((response) =>{ 
-                return response.json()
-            })        
-    }
           return (
             <div key={"root-content"}>
                 <Header {...props}></Header>
@@ -84,7 +86,7 @@ export default function Home(props){
                     </div>
                     <div  id="filter-container" className="right">
                         {/*for movies filter*/}
-                        <MovieFilter moviesData={releaseMovies.moviesData} genres ={genres} artists={artists} applyFilters={(filteredMoviesData)=>applyFilters(filteredMoviesData)}
+                        <MovieFilter moviesData={releaseMovies.moviesData} applyFilters={(filteredMoviesData)=>applyFilters(filteredMoviesData)}
                         />
                     </div>
                </div>

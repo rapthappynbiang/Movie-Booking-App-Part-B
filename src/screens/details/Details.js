@@ -9,53 +9,47 @@ import YouTube from 'react-youtube';
 import {useState, useEffect} from 'react';
 import Header from '../../common/header/Header'
 import './Details.css';
-//import for testing purpose actual scenario we have to fetch data from server
-import moviesData from '../../assets/moviesData'
 
 
 export  default function Details(props){
     
-    
-    console.log(props);
-    
-    const movieId = useParams();
-    var movieData;
+    var movieId = props.match.params.id;
 
-    for(let i=0;i<moviesData.length;i++){
-        if(moviesData[i].id == movieId.id){
-            movieData = moviesData[i];
-            break;
-        }
+    //for testing purpose since no server is setup yet
+    if(movieId===null){
+         movieId = "M1"
     }
+    const [movieData, setMovie] = useState([{
+                                        id: movieId,
+                                        title: "",
+                                        poster_url:"",
+                                        trailer_url: "",
+                                        wiki_url: "",
+                                        genres: [],
+                                        artists: [],
+                                        story_line: "",
+                                        release_date: "yyyy-mm-ddT.....",
+                                        duration: "",
+                                        critics_ratings: null,
 
-
-    const [movie, setMovie] = useState([{
-        title: movieData.title, 
-        genres: movieData.genres,
-        duration: movieData.duration,
-        release_date: movieData.release_date,
-        rating: movieData.critics_rating,
-        poster_url: movieData.poster_url,
-        wiki_url: movieData.wiki_url,
-        trailer_url: movieData.trailer_url,
-        story_line: movieData.storyline,
-        artists: movieData.artists
-    }]);s
+    }]);
 
         useEffect(()=>{
             //load data from server
-            const url = "https://localhost:8085/movies/" + props.match.params.id;
-            fetch(url,{
-                method: 'GET', // 'GET', 'PUT', 'PATCH', 'DELETE' all work here
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: dataShows
+            const url = "https://localhost:8085/movies/" + movieId;
+            
+            var requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+            };
+
+            fetch(url, requestOptions)
+            .then(response => response.json())
+            .then(result =>{
+                //set movieData
+                setMovie(result)
             })
-            .then((response) =>{ 
-                //set the movie state
-                setMovie(response.json())
-            })
+            .catch(error => console.log('error', error));
             
         },[]);
 
@@ -81,24 +75,24 @@ export  default function Details(props){
 
                         {/**-------------Movie Image ---------------------*/}
                         <div id="left">
-                            <img src={movie[0].poster_url}  alt={movie[0].title} style={{width: '80%'}}/>
+                            <img src={movieData[0].poster_url}  alt={movieData[0].title} style={{width: '80%'}}/>
                         </div>
 
                         {/**-------------Movie details with trailer---------------------*/}
                         <div id="middle">
                             <Typography variant="h2" style={{display: 'block'}}>
-                            {movie[0].title}
+                            {movieData[0].title}
                             </Typography>
                             
                             <Typography variant="subtitle1" style={{display: 'block'}}>
                             <b>Genres:</b> {(()=>{
-                                let genresStr = movie[0].genres[0];
-                                for(let i=1;i<movie[0].genres.length;i++){
-                                    if(i=== movie[0].genres.length-1){
+                                let genresStr = movieData[0].genres[0];
+                                for(let i=1;i<movieData[0].genres.length;i++){
+                                    if(i=== movieData[0].genres.length-1){
                                         //last element in genres array
-                                        genresStr = genresStr + ", " + movie[0].genres[i];
+                                        genresStr = genresStr + ", " + movieData[0].genres[i];
                                     }else{
-                                        genresStr = genresStr + ", " + movie[0].genres[i];
+                                        genresStr = genresStr + ", " + movieData[0].genres[i];
                                     }
                                 }
                                 return genresStr;
@@ -106,19 +100,19 @@ export  default function Details(props){
                             </Typography>
                             
                             <Typography variant="subtitle1" style={{display: 'block'}}>
-                            <b>Duration:</b> {movie[0].duration}  
+                            <b>Duration:</b> {movieData[0].duration}  
                             </Typography>
                             
                             <Typography variant="subtitle1" style={{display: 'block'}}>
-                            <b>Release Date:</b> {formatDateString(movie[0].release_date)}
+                            <b>Release Date:</b> {formatDateString(movieData[0].release_date)}
                             </Typography>
                             
                             <Typography variant="subtitle1" style={{display: 'block'}}>
-                            <b>Rating:</b> {movie[0].rating}
+                            <b>Rating:</b> {movieData[0].rating}
                             </Typography>
                             
                             <Typography variant="subtitle1" style={{display: 'block', marginTop: '16px'}}>
-                            <b>Plot:</b> <a href={movie[0].wiki_url} target="_blank" style={{textDecorationLine: 'none'}}>(Wiki link)</a> {movie[0].story_line}
+                            <b>Plot:</b> <a href={movieData[0].wiki_url} target="_blank" style={{textDecorationLine: 'none'}}>(Wiki link)</a> {movieData[0].story_line}
                             </Typography>
                             
                             <Typography variant="h5" style={{display: 'block', marginTop: '16px'}}>
@@ -126,7 +120,7 @@ export  default function Details(props){
                             </Typography>
                             
                             <div className="video-container">
-                            <YouTube videoId={movie[0].trailer_url.split('=')[1]} style={{width: '90%'}} opts={opts} onReady={(event)=>_onReady(event)}/>
+                            <YouTube videoId={movieData[0].trailer_url.split('=')[1]} style={{width: '90%'}} opts={opts} onReady={(event)=>_onReady(event)}/>
                             </div>
                         </div>
 
@@ -160,7 +154,7 @@ export  default function Details(props){
                                         <b>Artists:</b>
                                     </Typography>
                                     <ImageList cols={2}>
-                                        {movie[0].artists.map((artist)=>(
+                                        {movieData[0].artists.map((artist)=>(
                                             <ImageListItem key={artist.id}>
                                                 <img id={"image-"+artist.id} src={artist.profile_url} alt={artist.firs_name}/>
                                                 <ImageListItemBar key={"artist-name-"+artist.id} title={artist.first_name + " " + artist.last_name} />

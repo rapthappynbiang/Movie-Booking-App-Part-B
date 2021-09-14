@@ -31,43 +31,41 @@ export default function MovieFilter(props){
                                           last_name: ""
                                      }]);
     const [genres, setGenres] = useState([{id: "", name: ""}]);
+
     //state for selected input fields bu genre and artists respectively
-    const [genreName, setGenreName] = React.useState([]);
-    const [artistName, setArtistsName] = React.useState([]);
+    const [genreName, setGenreName] = useState([]);
+    const [artistName, setArtistsName] = useState([]);
 
-    var moviesData = props.moviesData.moviesData;
-
+    //storing filtered data
     const [filteredMoviesData, setFilteredData] = useState({});
 
     //After mounting fetch data load the data but currently not using
     useEffect(()=>{
         // fetch  artists data with url from server
-        var downloadArtists = loadData("https://localhost:8085/api/artists");
+        var raw = "";
+
+        var requestOptions = {
+          method: 'GET',
+          body: raw,
+          redirect: 'follow'
+        };
+
+        fetch("http://localhost:8085/api/artists", requestOptions)
+          .then(response => response.json())
+          .then(result => {
+            setArtists(result["artists"]);
+          })
+          .catch(error => console.log('error', error));
+
         //fetch genres data from server
-        var downloadGenres = loadData("https://localhost:8085/api/genres");
+        fetch("http://localhost:8085/api/genres", requestOptions)
+          .then(response => response.json())
+          .then(result => {
+            setGenres(result["genres"]);
+          })
+          .catch(error => console.log('error', error));
 
-        //updata the data in the state
-        setArtists(downloadArtists);
-        setGenres(downloadGenres);
     },[])
-
-    //the loadData function for fetching data from server
-    function loadData(url){
-      fetch(url,{
-        method: 'GET', // 'GET', 'PUT', 'PATCH', 'DELETE' all work here
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: dataShows
-    })
-    .then((response) =>{ 
-        return response.json()
-    })
-       
-      //return the data
-      return data;
-    }
-
 
     //When select by Genre field change
     const handleGenreChange = (event)=>{
@@ -141,7 +139,7 @@ export default function MovieFilter(props){
                           onChange ={handleGenreChange}
                           renderValue={(selected)=> selected.join(', ')}
                         >
-                            {props.genres.map((genre)=>(
+                            {genres.map((genre)=>(
                               <MenuItem Key={"genre-menu-item-"+genre.id} value={genre.name} >
                                   <Checkbox key={"checkbox-item-"+genre.id} checked={genreName.indexOf(genre.name) > -1}/>
                                 <ListItemText key={"genre-list-item-"+genre.id} primary={genre.name} />
@@ -166,7 +164,7 @@ export default function MovieFilter(props){
                           onChange ={handleArtistsChange}
                           renderValue={(selected) => selected.join(', ')}
                         >
-                            {props.artists.map((artist)=>(
+                            {artists.map((artist)=>(
                               <MenuItem Key={"menu-item-"+artist["id"]} value={artist["first_name"] + " " + artist["last_name"]} >
                                   <Checkbox key={"check-box-item-"+artist.id} checked={artistName.indexOf(artist["first_name"]+" "+artist["last_name"]) > -1}/>
                                 <ListItemText key={"item-"+artist.id} primary={artist["first_name"] + " " + artist["last_name"]} />
@@ -209,7 +207,8 @@ export default function MovieFilter(props){
         //---------------------------------------On input change------------------------------//
         function handleInputChange(event){
       
-          var name= event.target.id;
+          var id= event.target.id;
+          var name = event.target.name;
           var value = event.target.value;
           document.getElementById(id).value = value;
     

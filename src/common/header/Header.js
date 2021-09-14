@@ -93,7 +93,7 @@ const customStyles = {
                                  redirect: 'follow'
                                };
                                
-                               fetch(`http://localhost:8085/api/auth/login?username=${b2a(loginData.username)}&password=${b2a(loginData.password)}`, requestOptions)
+                               fetch(`http://localhost:8085/api/auth/login?username=${loginData.username}&password=${loginData.password}`, requestOptions)
                                  .then(response => response.text())
                                  .then((result) => {
                                         //store accessToken and uuid
@@ -308,6 +308,7 @@ const customStyles = {
 
 export default function Header(props){
         
+        
         //to set open state of login/register modal
         const [modalIsOpen, setIsOpen] = useState(false);
         //value of tab in modal either 0(Login) or 1(register)
@@ -316,8 +317,8 @@ export default function Header(props){
         //set isLoggedInState
         const [isLoggedIn, setIsLoggedIn] = useState(window.localStorage.getItem("isLoggedIn"));
 
-        function handleTabChange(event){
-            setValue(event.target.value);
+        function handleTabChange(event, newValue){
+            setValue(newValue);
         }
         
          return <div id="header" className="header">
@@ -339,8 +340,8 @@ export default function Header(props){
                                                         >
                                                         <div>
                                                                 <Tabs value={value} onChange={handleTabChange} aria-label="simple tabs example">
-                                                                <Tab label="LOGIN" value={0} index={0}/>
-                                                                <Tab label="REGISTER" value={1} index={1}/>
+                                                                <Tab label="LOGIN"/>
+                                                                <Tab label="REGISTER"/>
                                                                 </Tabs>
                                                                 {/* Login Tab */}
                                                                 {value == 0 && <LoginTab handleClose={handleClose} setIsLoggedIn={setIsLoggedIn} />}
@@ -350,7 +351,7 @@ export default function Header(props){
                                                         </Modal>
                                                 </div>
                                                         );
-                                }else if(path == "/movie/:id"){
+                                }else if(path == "/movies/:id"){
                                         // if page is detatial page we render necessary buttons
                                         return(
                                                 <div class="btn-container">
