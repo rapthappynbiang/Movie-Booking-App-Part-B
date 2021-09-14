@@ -9,6 +9,7 @@ import YouTube from 'react-youtube';
 import {useState, useEffect} from 'react';
 import Header from '../../common/header/Header'
 import './Details.css';
+//import for testing purpose actual scenario we have to fetch data from server
 import moviesData from '../../assets/moviesData'
 
 
@@ -39,11 +40,25 @@ export  default function Details(props){
         trailer_url: movieData.trailer_url,
         story_line: movieData.storyline,
         artists: movieData.artists
-    }]);
+    }]);s
 
         useEffect(()=>{
+            //load data from server
+            const url = "https://localhost:8085/movies/" + props.match.params.id;
+            fetch(url,{
+                method: 'GET', // 'GET', 'PUT', 'PATCH', 'DELETE' all work here
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: dataShows
+            })
+            .then((response) =>{ 
+                //set the movie state
+                setMovie(response.json())
+            })
             
-        },[movie])
+        },[]);
+
          //for YouTube video tag
         const opts = {
             height: '390',

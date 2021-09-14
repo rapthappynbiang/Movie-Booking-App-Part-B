@@ -16,7 +16,7 @@ export default function ImageListReleased(props){
             {moviesData.map((movie) => (
               
               <ImageListItem key={"movie-item"+movie.id} className="movie-item" style={{width: '19%', height: 350, margin: '2% 1% 0%'}}>
-               <Link to = {'/movie/'+ movie.id}>
+               <Link to = {'/movies/'+ movie.id}>
                 <img src={movie.poster_url} alt={movie.title} style={{width: 'fit-content'}} />
                    <ImageListItemBar
                      key={"item-bar-"+movie.id}

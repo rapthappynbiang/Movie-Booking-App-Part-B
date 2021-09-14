@@ -85,17 +85,26 @@ const customStyles = {
 
                                //SEND logindata for authentication
                                //if authentication is successful we set isloggin in localstorage as true
+                               var raw = "Authorization: Basic dGVzdDp0ZXN0QDEyMw==\nContent-Type: application/json\nCache-Control: no-cache\n";
 
-                               //below code is hard coded just for demonstration
-                               if(uname === "admin" && pword==="admin"){
-                                       alert('You have successfully Loggedin');
-                                       //close modal
-                                       //show logout button
-                                       localStorage.setItem("isLoggedIn", true);
-                                        props.handleClose();
-                                        //set login state as true to show logout button
+                               var requestOptions = {
+                                 method: 'POST',
+                                 body: raw,
+                                 redirect: 'follow'
+                               };
+                               
+                               fetch(`http://localhost:8085/api/auth/login?username=${b2a(loginData.username)}&password=${b2a(loginData.password)}`, requestOptions)
+                                 .then(response => response.text())
+                                 .then((result) => {
+                                        //store accessToken and uuid
+                                        //set isLogin true
+                                        window.localStorage.setItem("isLoggedIn", true);
                                         props.setIsLoggedIn(true);
-                               }
+                                        //close modal;
+                                        props.handleClose()
+
+                                 })
+                                 .catch(error => console.log('error', error));
                         }
 
                 }
@@ -139,7 +148,7 @@ const customStyles = {
                       },
                       {
                         label: "Contact No*",
-                        name: "contact",
+                        name: "mobile-number",
                         id: "registration-contact-no",
                         type: "text"  
                       },
@@ -147,11 +156,11 @@ const customStyles = {
 
               //Registration data
               const RegistrationData = {
-                      firstName: "",
-                      lastName: "",
                       email: "",
+                      firstName: "", 
+                      lastName: "",
+                      mobile_number: null,
                       password: "",
-                      contact: ""
               }
 
         return (<div>
@@ -198,7 +207,6 @@ const customStyles = {
                             return;
                     }else if(validationName==="last-name"){
                         if(value === ""){
-                                debugger;
                                 setLastNameError("required");
                         }else{
                                 setLastNameError("");
@@ -211,7 +219,7 @@ const customStyles = {
                                 setEmailError("required");
                             }else{
                                 const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                               var isValid = re.test(value); 
+                                var isValid = re.test(value); 
 
                                if(isValid){
                                        setEmailError("");
@@ -244,7 +252,7 @@ const customStyles = {
                                 if(regx.test(value)){
                                         setContactError("");
                                         //set registration phone number
-                                        RegistrationData.contact = value;
+                                        RegistrationData.mobile_number = value;
                                 }else{
                                          setContactError("Please enter a Valid Number");
                                 } 
@@ -281,6 +289,18 @@ const customStyles = {
                      if(areInputsFilled){
                              setSucessMEssage("Registration successful. Please login!");
                              //sent data to server if possible
+                             var raw = `{\n            \"email_address\":"${RegistrationData.email}",\n            \"first_name\": “${RegistrationData.firstName}”,\n            \"last_name\":”${RegistrationData.lastName}”,\n            \"mobile_number\":${RegistrationData.mobile_number},\n            \"password\": “${RegistrationData.password}”\n        }\n`;
+
+                                var requestOptions = {
+                                method: 'POST',
+                                body: raw,
+                                redirect: 'follow'
+                                };
+
+                                fetch("http://localhost:8085/api/auth/signup", requestOptions)
+                                .then(response => response.text())
+                                .then(result => console.log(result))
+                                .catch(error => console.log('error', error));
                      }
               }
        
@@ -296,8 +316,8 @@ export default function Header(props){
         //set isLoggedInState
         const [isLoggedIn, setIsLoggedIn] = useState(window.localStorage.getItem("isLoggedIn"));
 
-        function handleTabChange(event, newvalue){
-            setValue(newvalue);
+        function handleTabChange(event){
+            setValue(event.target.value);
         }
         
          return <div id="header" className="header">
@@ -319,8 +339,8 @@ export default function Header(props){
                                                         >
                                                         <div>
                                                                 <Tabs value={value} onChange={handleTabChange} aria-label="simple tabs example">
-                                                                <Tab label="LOGIN"/>
-                                                                <Tab label="REGISTER"/>
+                                                                <Tab label="LOGIN" value={0} index={0}/>
+                                                                <Tab label="REGISTER" value={1} index={1}/>
                                                                 </Tabs>
                                                                 {/* Login Tab */}
                                                                 {value == 0 && <LoginTab handleClose={handleClose} setIsLoggedIn={setIsLoggedIn} />}
@@ -370,9 +390,9 @@ export default function Header(props){
                                 })()}
                 </div>
 
-       function bookingHandler(event){
+       function bookingHandler(){
                 if(window.localStorage.userName === undefined || window.localStorage.userName === null){
-                        //    alert("Please Login");
+                        // alert("Please Login");
                         //open login Modal
                         handleModalOpen();
 

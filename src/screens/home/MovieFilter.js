@@ -1,11 +1,11 @@
-import React from 'react';
+import { React, useState, useEffect } from 'react';
 import { Button, Card, CardContent, CardHeader, Checkbox, ListItemText, MenuItem } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
 import { Select } from '@material-ui/core'; 
 import { FormHelperText } from '@material-ui/core';
-import { makeStyles, ThemeProvider } from '@material-ui/styles';
+import { makeStyles} from '@material-ui/styles';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -17,28 +17,100 @@ const useStyles = makeStyles((theme) => ({
       minWidth: 240,
       maxWidth: 240,
       justifyContent: 'center',
-    },
-    content: {
-      
     }
   }));
 
 export default function MovieFilter(props){
 
     const classes = useStyles();
+
+    //artists object and genres object for select menus
+    const [artists, setArtists] = useState([{
+                                          id: "",
+                                          first_name: "",
+                                          last_name: ""
+                                     }]);
+    const [genres, setGenres] = useState([{id: "", name: ""}]);
+    //state for selected input fields bu genre and artists respectively
     const [genreName, setGenreName] = React.useState([]);
     const [artistName, setArtistsName] = React.useState([]);
 
     var moviesData = props.moviesData.moviesData;
 
-    var filteredMoviesData = {moviesData: []};
+    const [filteredMoviesData, setFilteredData] = useState({});
 
-    const handleGenreChange = (event)=>{
-      setGenreName(event.target.value);
+    //After mounting fetch data load the data but currently not using
+    useEffect(()=>{
+        // fetch  artists data with url from server
+        var downloadArtists = loadData("https://localhost:8085/api/artists");
+        //fetch genres data from server
+        var downloadGenres = loadData("https://localhost:8085/api/genres");
+
+        //updata the data in the state
+        setArtists(downloadArtists);
+        setGenres(downloadGenres);
+    },[])
+
+    //the loadData function for fetching data from server
+    function loadData(url){
+      fetch(url,{
+        method: 'GET', // 'GET', 'PUT', 'PATCH', 'DELETE' all work here
+        headers: {
+        'Content-Type': 'application/json',
+        },
+        body: dataShows
+    })
+    .then((response) =>{ 
+        return response.json()
+    })
+       
+      //return the data
+      return data;
     }
 
+
+    //When select by Genre field change
+    const handleGenreChange = (event)=>{
+
+      //set value of input for displaying
+      setGenreName(event.target.value); 
+
+      var isPresent = false;
+        //values maybe multiple like value1, value2, value3,...
+        //the value is an array we store those selected values in genres
+
+        var value =  event.target.value
+         //set Artists name for displaying as inputs
+        setGenreName(value);
+        
+        var genresList =value[0];
+        for(let i=1;i<value.length;i++){
+          genresList = genresList + "," + value[i];
+        }
+
+        //set FilteredData
+        setFilteredData({
+          ...filteredMoviesData, genres: genresList
+        })
+    }
+
+    //when select by Artists field is change
     const handleArtistsChange = (event)=>{
-      setArtistsName(event.target.value);
+         
+
+         var value =  event.target.value
+         //set Artists name for displaying as inputs
+        setArtistsName(value);
+        
+        var artistsList =value[0];
+        for(let i=1;i<value.length;i++){
+          artistsList = artistsList + "," + value[i];
+        }
+
+        //set FilteredData
+        setFilteredData({
+          ...filteredMoviesData, artists: artistsList
+        })
     }
     
         return (
@@ -50,7 +122,7 @@ export default function MovieFilter(props){
                   <CardContent key={"movie-name"} className={classes.cardContent}>
                     <FormControl key={"1"}>
                         <InputLabel key={"input-label-1"} htmlFor="movie-name">Movie Name</InputLabel>
-                        <Input type="text" id="movie-name" aria-describedby="my-helper-text" style={{width: '240px'}} onChange={handleInputChange} />
+                        <Input type="text" id="movie-name" name="title" aria-describedby="my-helper-text" style={{width: '240px'}} onChange={handleInputChange} />
                     </FormControl>
                   </CardContent>
 
@@ -61,6 +133,7 @@ export default function MovieFilter(props){
                         <InputLabel key={"input-label-2"} htmlFor="genres">Genres</InputLabel>
                         <Select
                           labelId="genres"
+                          name="genres"
                           id="select-genre"
                           multiple
                           style={{width: '240px'}}
@@ -85,6 +158,7 @@ export default function MovieFilter(props){
                         <InputLabel key={"input-label-3"} htmlFor="artists">Artists</InputLabel>
                         <Select
                           labelId="artists"
+                          name="artists"
                           id="select-artists"
                           multiple
                           style={{width: '240px'}}
@@ -107,7 +181,7 @@ export default function MovieFilter(props){
                     <FormControl key={"form-control-4"}>
                         <FormHelperText>Release date start</FormHelperText>
                         <InputLabel key={"input-label-4"} htmlFor="start-date"></InputLabel>
-                        <Input disabled type="date" id="start-date" aria-describedby="my-helper-text" style={{width: '240px'}} onChange={handleInputChange}/>
+                        <Input disabled type="date" name="start_data" id="release-start-date" aria-describedby="my-helper-text" style={{width: '240px'}} onChange={handleInputChange}/>
                     </FormControl>
                 </CardContent>
 
@@ -116,7 +190,7 @@ export default function MovieFilter(props){
                     <FormControl key={"form-control-5"}>
                         <FormHelperText>Release date end</FormHelperText>
                         <InputLabel key={"input-label-5"} htmlFor="end-date"></InputLabel>
-                        <Input disabled type="date" id="end-date" aria-describedby="my-helper-text" style={{width: '240px'}} onChange={handleInputChange} />
+                        <Input disabled type="date" name="end_data" id="release-end-date" aria-describedby="my-helper-text" style={{width: '240px'}} onChange={handleInputChange} />
                     </FormControl>
                 </CardContent>
 
@@ -135,118 +209,32 @@ export default function MovieFilter(props){
         //---------------------------------------On input change------------------------------//
         function handleInputChange(event){
       
-          var id= event.target.id;
+          var name= event.target.id;
           var value = event.target.value;
           document.getElementById(id).value = value;
     
-          //update the filtered movies data
-            //loop through entire movie data for a match if match update
-            let isPresent = false;
-            // search by name
-              if(id === "movie-name"){
-                //check for data from the moviesData for a match{
-                  for(let i=0;i<moviesData.length;i++){
-                    //comapre the value
-                    if(value.toUpperCase() === moviesData[i].title.toUpperCase()){
-                      //if equal check if data is already present if filtered data is not empty
-                      if(filteredMoviesData.moviesData.length!==0){
-                        //iterate and check
-                        for(let j=0;j<filteredMoviesData.moviesData.length;j++){
-                          // if id is present then set isPresent true and break
-                          if(moviesData[i].id === filteredMoviesData[j].id){
-                            isPresent = true;
-                            break;
-                          }
-                        }
-    
-                        //Movie not present push 
-                        if(isPresent === false){
-                            filteredMoviesData.moviesData.push(moviesData[i]);
-                            break;
-                        }
-                      }else{
-                        filteredMoviesData.moviesData.push(moviesData[i]);
-                        break;
-                      }
-    
-                    }
-    
-                  }   
-              }else if(id === "select-genre"){
-                  //search by genre
-                  for(let i=0;i<moviesData.length;i++){
-                    for(let j=0;j<moviesData[i].grnres.length;j++){
-                      //check if genres are matching
-                      if(value.toUpperCase() === moviesData[i].grnres[j].toUpperCase()){
-                        //check if movie is present in filtered data
-                        if(filteredMoviesData.moviesData.length !== 0){
-                          for(let k=0;k<filteredMoviesData.moviesData.length;k++){
-                            //if movie id is matching and it is present break
-                            if(moviesData[i].id === filteredMoviesData.moviesData[k].id){
-                              isPresent = true;
-                              break;
-                            }
-                          }
-                          if(isPresent === false){
-                            //if movie not present push it
-                            isPresent= true;
-                            filteredMoviesData.moviesData.push(moviesData[i]);
-                            break;
-                          }
-                        }else{
-                          //if filtered data is empty push
-                            filteredMoviesData.moviesData.push(moviesData[i]);
-                            break;
-                        }
-                      }
-                    }
-    
-                    if(isPresent === true){
-                      break;
-                    }
-                  }
-              }else{
-                  // search by artists
-                  for(let i=0; i<moviesData.length;i++){
-                    //compare with value by iterating the artists array
-                    for(let j=0;j<moviesData[i].artists.length;j++){
-                      // if equal check if movie is alreadyfiltered
-                      if(value.toUpperCase() === moviesData[i].artists[j].toUpperCase()){
-                        //if filtered array is nt empty
-                        if(filteredMoviesData.moviesData.length !== 0){
-                          //iterate through filtered data
-                          for(let k=0;k<filteredMoviesData.moviesData.length;k++){
-                            //if movie id is present set isPresent to true and break
-                            if(moviesData.id === filteredMoviesData.moviesData[k].id){
-                              isPresent = true;
-                              break;
-                            }
-                          }
-    
-                          //if movie is not present push
-                          if(isPresent === false){
-                            isPresent = true;
-                            filteredMoviesData.moviesData.push(moviesData[i]);
-                            break;
-                          }
-                        }else{
-                          isPresent = true;
-                          filteredMoviesData.moviesData.push(moviesData[i]);
-                          break;
-                        }
-                      }
-                    }
-    
-                    //movie is push;
-                    if(isPresent === true){
-                      break;
-                    }
-                  }
-              }
-        }
+          //update filtered Data
+          setFilteredData({
+            ...filteredMoviesData, [name]: value
+          })
+
+      }
 
         function applyFilters(filteredMoviesData){
-          debugger;
-          props.applyFilters(filteredMoviesData);
+
+
+         //fetch the appllied movie Filters
+          var raw = "";
+
+          var requestOptions = {
+            method: 'GET',
+            body: raw,
+            redirect: 'follow'
+          };
+
+          fetch(`http://localhost:8085/api/movies?status=RELEASED&title=${filteredMoviesData.title}&genres=${filteredMoviesData.genres}&artists=${filteredMoviesData.artists}&start_date=${filteredMoviesData.start_date}&end_date=${filteredMoviesData.end_date}`, requestOptions)
+            .then(response => response.text())
+            .then(result => props.applyFilters(result))
+            .catch(error => console.log('error', error));
         }
   }
